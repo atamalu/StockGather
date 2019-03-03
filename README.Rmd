@@ -1,0 +1,52 @@
+---
+title: "Stock Data Gathering Functions"
+output: github_document
+---
+
+### Required packages
+- dplyr
+- rvest
+
+### Yahoo! Finance
+
+```{r setup, include=FALSE}
+library(dplyr)
+library(rvest)
+
+source('R/news_links.R')
+source('R/stock_news.R')
+source('R/sec_financial_docs.R')
+source('R/download_sec_filings.R')
+```
+
+`news_links` gives the first 15 news links from Apple's stock, AAPL.
+
+```{r}
+news.links <- news_links(stock.name = 'aapl')
+head(news.links)
+```
+
+`stock_news` uses the links acquired from `news_links` to retrieve the text from each news article 
+
+```{r}
+aapl.news <- stock_news(stock.links = news.links)
+head(summary(aapl.news))
+```
+
+### Financial Documents
+
+`sec_financial_docs` returns the links for documents to download. If the keyword does not return a page with the document links, the user is provided with a prompt of options to choose from. Alternatively, you can re-run the function using the desired company name acquired from the printed list.
+
+```{r}
+### Use name from 
+financial.docs <- sec_financial_docs(company.keywords = 'apple inc', items.per.page = 10)
+summary(financial.docs)
+```
+
+`download_sec_filings` downloads the documents whose info were acquired using `sec_financial_docs` and stores them into the current working directory
+
+```{r eval = FALSE}
+### not run
+filinglink <- financial.docs$Filing.Link[[1]]
+download_sec_filings(filing.link = filinglink)
+```
